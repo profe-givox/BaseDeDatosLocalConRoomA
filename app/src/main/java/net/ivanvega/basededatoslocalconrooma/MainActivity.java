@@ -20,14 +20,6 @@ public class MainActivity extends AppCompatActivity {
 Button btnIn ;
 
 
-    AsyncTask<Integer, Integer, Integer >  tareaAsincrona = new AsyncTask<Integer, Integer, Integer>() {
-        @Override
-        protected Integer doInBackground(Integer... integers) {
-
-            return null;
-        }
-
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,23 +30,28 @@ Button btnIn ;
 
        btnIn.setOnClickListener(view -> {
 
-           AppDatabase db = AppDatabase.getDatabaseInstance(getApplication());
+           AppDatabase db =
+                   AppDatabase.getDatabaseInstance(getApplication());
 
            UserDao dao = db.userDao();
+
+
 
             AppDatabase.databaseWriteExecutor.execute(() -> {
                 User u = new User();
 
-                u.uid = 0;
+                //u.uid = 0;
                 u.firstName = "Juan";
                 u.lastName = "Peres";
 
                 dao.insertAll( u );
-
+                /*
                 Toast.makeText(this,
                         "Insertado",
                         Toast.LENGTH_LONG).show();
 
+                 */
+                Log.d("DBUsuario", "Elemento insertado");
             });
        });
 
@@ -66,7 +63,7 @@ Button btnIn ;
                AppDatabase.databaseWriteExecutor.execute(() -> {
                    dao.getAll().stream().forEach(user -> {
                        Log.i("Consulta User",
-                           user.uid + " " + user.firstName);
+                           user.uid + " " + user .firstName);
 
                    });
                });
