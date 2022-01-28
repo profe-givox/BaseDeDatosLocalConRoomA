@@ -20,12 +20,12 @@ import java.util.List;
 public class MiContentProvider extends ContentProvider {
     /*Estructura de mi uri:
         uri -> content://net.ivanvega.basededatoslocalconrooma.provider/user  -> insert y query
-        uri -> content://net.ivanvega.basededatoslocalconrooma.provider/user/#  -> uodate y delete
-        uri -> content://net.ivanvega.basededatoslocalconrooma.provider/user/*  -> query, update y delete
-    */
+        uri -> content://net.ivanvega.basededatoslocalconrooma.provider/user/#  -> uodate, query y delete
+        uri -> content://net.ivanvega.basededatoslocalconrooma.provider/user/*  -> query, update y delete}
+                        net.ivanvega.basededatoslocalconrooma.provider
+     */
 
     private static final UriMatcher sURIMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-
     static
     {
 
@@ -34,12 +34,27 @@ public class MiContentProvider extends ContentProvider {
         sURIMatcher.addURI("net.ivanvega.basededatoslocalconrooma.provider","user/*", 3);
     }
 
-
     @Override
     public boolean onCreate() {
 
         return false;
     }
+
+    private Cursor listUserToCursorUser( List<User>   usuaarios){
+        MatrixCursor cursor = new MatrixCursor(new String[]{
+                "uid","first_name","last_name"
+        })    ;
+
+        for(User usuario: usuaarios ){
+            cursor.newRow().add("uid", usuario.uid)
+                    .add("first_name", usuario.firstName)
+                    .add("last_name", usuario.lastName);
+        }
+
+        return cursor;
+    }
+
+
 
     @Nullable
     @Override
@@ -52,13 +67,13 @@ public class MiContentProvider extends ContentProvider {
         AppDatabase db =
                 AppDatabase.getDatabaseInstance(getContext());
 
+        Cursor cursor= null;
+
         UserDao dao = db.userDao();
-
-
         switch (sURIMatcher.match(uri)){
-            case 1:
+                case 1:
 
-                dao.getAll();
+                cursor =   listUserToCursorUser( dao.getAll());
                 break;
             case 2:
                 break;
@@ -67,21 +82,57 @@ public class MiContentProvider extends ContentProvider {
                 break;
 
         }
-
-
-        return null;
+        return cursor;
     }
 
     @Nullable
     @Override
     public String getType(@NonNull Uri uri) {
-        return null;
+
+        String typeMime = "";
+
+        switch (sURIMatcher.match(uri)) {
+            case 1:
+                typeMime = "vnd.android.cursor.dir/vnd.net.ivanvega.basededatoslocalconrooma.provider.user";
+                break;
+            case 2:
+                typeMime = "vnd.android.cursor.item/vnd.net.ivanvega.basededatoslocalconrooma.provider.user";
+                break;
+            case 3:
+
+                typeMime = "vnd.android.cursor.dir/vnd.net.ivanvega.basededatoslocalconrooma.provider.user";
+                break;
+        }
+        return typeMime;
     }
 
     @Nullable
     @Override
     public Uri insert(@NonNull Uri uri,
                       @Nullable ContentValues contentValues) {
+
+        AppDatabase db =
+                AppDatabase.getDatabaseInstance(getContext());
+
+        Cursor cursor= null;
+
+        UserDao dao = db.userDao();
+
+        switch (sURIMatcher.match(uri)){
+            case 1:
+
+                User usuario = new User();
+                usuario.firstName = contentValues.getAsString(UsuarioContrato.COLUMN_FIRSTNAME);
+                usuario.lastName = contentValues.getAsString(UsuarioContrato.COLUMN_LASTNAME);
+
+                dao.insertAll(usuario);
+
+
+                break;
+
+        }
+
+
         return null;
     }
 

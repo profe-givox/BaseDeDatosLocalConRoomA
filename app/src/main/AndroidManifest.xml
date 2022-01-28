@@ -18,6 +18,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <provider
+            android:authorities="net.ivanvega.basededatoslocalconrooma.provider"
+            android:name=".provider.MiContentProvider"
+            android:exported="true"
+            ></provider>
+
     </application>
 
 </manifest>
